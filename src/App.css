@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+
+.cell-value-changed{
+  width: 70px;
+  height: 16px;
+  opacity: 0.87;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  /* text-align: right; */
+  color: #0065ff;
+}
+
+.affected-row{
+  font-weight: bold;
+}

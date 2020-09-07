@@ -3,52 +3,13 @@ import { AgGridReact } from 'ag-grid-react';
 // import MoodEditor from './moodEditor.jsx';
 // import MoodRenderer from './moodRenderer.jsx';
 import NumericEditor from './NumericEditor.js';
-
+import { columnDefs } from './colDefs';
 
 class Grid extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnDefs: [
-                {
-                    field: 'name',
-                    width: 300,
-                    // editable: true,
-                    // cellEditor: 'agRichSelectCellEditor',
-                    cellEditorParams: {
-                        values: [
-                            'Bob',
-                            'Harry',
-                            'Sally',
-                            'Mary',
-                            'John',
-                        ],
-                    },
-                    icons: {
-                        menu: '<i class="fa fa-shower"/>',
-                        filter: '<img src="https://raw.githubusercontent.com/ag-grid/ag-grid/master/grid-packages/ag-grid-docs/src/javascript-grid-icons/minus.png" style="height: 12px; width: 12px;padding-right: 2px"/>',
-                        columns: '<i class="fa fa-snowflake"/>',
-                        sortAscending: '<i class="fa fa-sort-alpha-up"/>',
-                        sortDescending: '<i class="fa fa-sort-alpha-down"/>',
-                      },
-                },
-                {
-                    field: 'mood',
-                    //   cellRenderer: 'moodRenderer',
-                    //   cellEditor: 'moodEditor',
-                    // editable: true,
-                    width: 300,
-                },
-                {
-                    headerName: 'Numeric',
-                    field: 'number',
-                    cellEditor: 'numericEditor',
-                    // editable: true,
-                    width: 280,
-                    cellStyle: (param) => this.editableColumn(param),
-                    // newValueHandler: this.compareValues
-                },
-            ],
+            columnDefs: columnDefs,
             rowData: this.createRowData(),
             frameworkComponents: {
                 // moodRenderer: MoodRenderer,
@@ -56,54 +17,34 @@ class Grid extends Component {
                 numericEditor: NumericEditor,
             },
             defaultColDef: {
-                editable: true,
+                // editable: true,
                 sortable: true,
                 flex: 1,
                 minWidth: 100,
                 filter: true,
                 resizable: true,
-            },
-            icons: {
-                menu: '<i class="fa fa-bath" style="width: 10px"/>',
-                filter: '<i class="fa fa-long-arrow-alt-down"/>',
-                columns: '<i class="fa fa-handshake"/>',
-                sortAscending: '<i class="fa fa-long-arrow-alt-down"/>',
-                sortDescending: '<i class="fa fa-long-arrow-alt-up"/>',
-                groupExpanded:
-                  '<img src="https://raw.githubusercontent.com/ag-grid/ag-grid/master/grid-packages/ag-grid-docs/src/javascript-grid-icons/minus.png" style="height: 12px; width: 12px;padding-right: 2px"/>',
+                cellClass: this.cellClass
             }
         }
 
-    }
-    editableColumn(param) {
-        console.log(param);
-        return param.colDef.equals = (oldValue, newValue) => {
-            // console.log(oldValue,newValue);
-            return param.column.colDef.cellStyle = {
-                'color': 'red',
-                'background-color': 'blue',
-                'hover':'black'
-            };
-        }
-    }
-    componentDidMount() {
     }
     createRowData = () => {
         return [
             {
                 name: 'Amruth L S',
                 mood: 'Happy',
-                number: 28,
+                cost: 100,
             },
             {
                 name: 'Harry',
                 mood: 'Sad',
-                number: 3,
+                cost: 200,
             },
             {
                 name: 'Sally',
                 mood: 'Happy',
-                number: 20,
+                cost: 300,
+                affectedRow: true
             }
         ];
     };
@@ -111,11 +52,31 @@ class Grid extends Component {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
     };
+    cellClass = (params) => {
+        // console.log('cellValueChanged', params);
+        if (params.node.eventService && params.node.eventService.firedEvents) {
+            //rowDataChanged
+            console.log(params.node.eventService.firedEvents);
+            if (params.node.eventService.firedEvents.cellChanged) {
+                return 'cell-value-changed';
+            }
+        }
+
+        //if cell is editable and value is affected
+        if (params.data.affectedRow === true && params.colDef.editable === true) {
+            return 'affected-row'
+        }
+    }
 
     onColumnValueChanged = params => {
-        // console.log(params)
+        // if (params.type === "cellValueChanged") {
+        //     // console.log('cellValueChanged', params);
+        //     params.column.colDef.cellClass = 'cell-value-changed';
+        //     params.api.refreshCells();
+        // }
+
         params.api.forEachNode(node => {
-            console.log(node.data);
+            // console.log(node.data);
         })
         // console.log(params.api.forEachNode)
     }
@@ -139,7 +100,6 @@ class Grid extends Component {
                         defaultColDef={this.state.defaultColDef}
                         onGridReady={this.onGridReady}
                         onCellValueChanged={this.onColumnValueChanged}
-                        icons={this.state.icons}
                     />
                 </div>
             </Fragment>
